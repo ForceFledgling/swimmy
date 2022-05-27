@@ -1,8 +1,12 @@
+import sys
+
 from logging.config import fileConfig
 
 from alembic import context
 
-from core.db import Base, SQLALCHEMY_DATABASE_URL
+from core.db import SQLALCHEMY_DATABASE_URL
+
+from core.base import Base
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -61,8 +65,10 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    configuration = config.get_section(config.config_ini_section)
+    configuration['sqlalchemy.url'] = SQLALCHEMY_DATABASE_URL
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
