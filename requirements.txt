@@ -4,3 +4,5 @@ pydantic
 alembic
 psycopg2-binary
 uvicorn
+fastapi-users[sqlalchemy]
+aiosqlite
