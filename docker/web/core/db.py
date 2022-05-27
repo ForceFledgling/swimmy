@@ -6,12 +6,12 @@ from sqlalchemy.orm import sessionmaker
 
 DB = {
     'HOST': os.environ.get("POSTGRES_HOST"),
-    'NAME': os.environ.get("POSTGRES_NAME"),
+    'DB': os.environ.get("POSTGRES_DB"),
     'USER': os.environ.get("POSTGRES_USER"),
     'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
 }
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{DB["USER"]}:{DB["PASSWORD"]}@{DB["HOST"]}/{DB["NAME"]}'
+SQLALCHEMY_DATABASE_URL = f'postgresql://{DB["USER"]}:{DB["PASSWORD"]}@{DB["HOST"]}/{DB["DB"]}'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
