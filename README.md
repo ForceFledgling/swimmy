@@ -6,6 +6,7 @@ Software system for organizing the work of sports swimming pools.
 * FastAPI
   * SQLAlchemy
   * Alembic
+  * Pydantic
 * PostgreSQL
 * Docker-compose
 
