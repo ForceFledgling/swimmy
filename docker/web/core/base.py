@@ -1,5 +1,5 @@
 from swimmy.models import Pool
 
-from user.models import User
+from user.db import User
 
 from .db import Base

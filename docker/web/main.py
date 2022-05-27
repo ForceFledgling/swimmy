@@ -2,6 +2,8 @@ from core.db import SessionLocal
 
 from fastapi import FastAPI
 
+from fastapi_users import FastAPIUsers
+
 from routes import routes
 
 from starlette.requests import Request
@@ -23,4 +25,6 @@ async def db_session_middleware(request: Request, call_next):
         request.state.db.close()
     return response
 
+
 app.include_router(routes)
+# app.include_router(fastapi_users.router, prefix='/users', tags=['users'])
