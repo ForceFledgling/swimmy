@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+
+  swimmy-db:
+    container_name: swimmy-db
+    image: postgres
+    restart: on-failure
+    env_file: .env
+    volumes:
+        - ./docker/db/data/:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+      
+  swimmy-web:
+    build: .
+    # command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    env_file: .env
+    volumes:
+      - ./docker/web:/code
+    ports:
+      - "80:8000"
+    depends_on:
+      - swimmy-db
