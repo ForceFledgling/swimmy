@@ -1,16 +1,12 @@
-import sys
-
 from logging.config import fileConfig
-
-from alembic import context
-
-from core.db import SQLALCHEMY_DATABASE_URL
-
-from core.base import Base
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from alembic import context
+
+from swimmy.settings import settings  # <---------------------- CHANGED
+from swimmy.tables import Base  # <---------------------- CHANGED
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -24,8 +20,8 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-target_metadata = Base.metadata
-# target_metadata = None
+# target_metadata = mymodel.Base.metadata
+target_metadata = Base.metadata  # <---------------------- CHANGED
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -45,8 +41,7 @@ def run_migrations_offline():
     script output.
 
     """
-    # url = config.get_main_option("sqlalchemy.url")
-    url = config.get_main_option(SQLALCHEMY_DATABASE_URL)
+    url = config.get_main_option(settings.database_url)  # <---------------------- CHANGED
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -65,17 +60,17 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    configuration = config.get_section(config.config_ini_section)
-    configuration['sqlalchemy.url'] = SQLALCHEMY_DATABASE_URL
+    configuration = config.get_section(config.config_ini_section)  # <---------------------- CHANGED
+    configuration['sqlalchemy.url'] = settings.database_url  # <---------------------- CHANGED
     connectable = engine_from_config(
-        configuration,
+        configuration,  # <---------------------- CHANGED
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata,
+            connection=connection, target_metadata=target_metadata
         )
 
         with context.begin_transaction():

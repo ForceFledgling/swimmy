@@ -19,15 +19,14 @@ git clone https://github.com/pvenv/swimmy.git
 
 * Create a .env file in the project's root directory and add the following variables.
 ```bash
+#FASTAPI
+SERVER_PORT='8000' 
+
 #POSTGRESQL
 POSTGRES_HOST='swimmy-db'
 POSTGRES_DB='swimmy'
-POSTGRES_USER='swimmy_db_username'
-POSTGRES_PASSWORD='swimmy_db_passwrod'
-
-# PG4ADMIN
-PGADMIN_DEFAULT_EMAIL=admin
-PGADMIN_DEFAULT_PASSWORD=admin
+POSTGRES_USER='root'
+POSTGRES_PASSWORD='toor'
 ```
 
 ### Additionally:
