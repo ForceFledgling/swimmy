@@ -18,6 +18,13 @@ git clone https://github.com/pvenv/swimmy.git
 ```
 
 * Create a .env file in the project's root directory and add the following variables.
+
+Note: you can use secret library to generate jwt_secret
+```python
+from secrets import token_urlsafe
+token_urlsafe(32)
+```
+
 ```bash
 #FASTAPI
 SERVER_PORT='8000' 
