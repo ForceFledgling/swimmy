@@ -1,7 +1,10 @@
-fastapi
-uvicorn
-pydantic
-python-dotenv
-sqlalchemy
-alembic
-psycopg2
+fastapi # веб фреймворк fastapi
+uvicorn # ASGI веб сервер
+pydantic # для серилизация типов
+python-dotenv # для переменных виртуального окружения
+fastapi-sqlalchemy # для работы с бд
+alembic # для миграций
+psycopg2 # адаптер для работы с PostgreSQL
+python-jose # для работы с JWT
+passlib[bcrypt] # для хешировани и валидации паролей
+python-multipart # парсер, используется для форм

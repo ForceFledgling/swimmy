@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     server_port: int = 8000
     database_url: str = f'postgresql://{DB["POSTGRES_USER"]}:{DB["POSTGRES_PASSWORD"]}@{DB["POSTGRES_HOST"]}/{DB["POSTGRES_DB"]}'
 
+    jwt_secret: str
+    jwt_algorithm: str = 'HS256'
+    jwt_expiration: int = 3600  # в секундах
+
 
 settings = Settings(
     _env_file='.env',
