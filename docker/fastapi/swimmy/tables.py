@@ -9,17 +9,17 @@ class User(Base):
     __tablename__ = 'users'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    role_id = sa.Column(sa.Integer, sa.ForeignKey('roles.id'))
+    role_name = sa.Column(sa.String)  # sa.ForeignKey('roles.name')
     email = sa.Column(sa.Text, unique=True)
     username = sa.Column(sa.Text, unique=True)
     password_hash = sa.Column(sa.Text)
 
 
-class Role(Base):
-    __tablename__ = 'roles'
+# class Role(Base):
+#     __tablename__ = 'roles'
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    name = sa.Column(sa.String)
+#     id = sa.Column(sa.Integer, primary_key=True)
+#     name = sa.Column(sa.String, unique=True)
 
 
 class Group(Base):

@@ -7,12 +7,13 @@ from ..services.auth import AuthService, get_current_user
 
 router = APIRouter(
     prefix='/auth',
+    tags=['auth'],
 )
 
 
 @router.post('/sign-up', response_model=Token)
 def sign_up(
-    user_data: UserCreate,
+    user_data: UserCreate = Depends(),
     service: AuthService = Depends(),
 ):
     return service.register_new_user(user_data)
@@ -29,6 +30,6 @@ def sign_in(
     )
 
 
-@router.get('/user', response_model=User)
-def get_user(user: User = Depends(get_current_user)):
-    return user
+@router.get("/me")
+async def get_current_user(current_user: User = Depends(get_current_user)):
+    return current_user

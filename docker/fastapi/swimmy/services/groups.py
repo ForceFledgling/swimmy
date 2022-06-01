@@ -1,7 +1,6 @@
-from http.client import HTTPException
 from typing import List
 
-from fastapi import Depends, status
+from fastapi import Depends, HTTPException, status
 
 from sqlalchemy.orm import Session
 
@@ -15,6 +14,14 @@ class GroupService:
         self.session = session
 
     def _get(self, group_id: int) -> tables.Group:
+        exception = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Group with this id does not exist',
+            headers={
+                'WWW-Authenticate': 'Bearer',
+            },
+        )
+
         group = (
             self.session
             .query(tables.Group)
@@ -22,7 +29,8 @@ class GroupService:
             .first()
         )
         if not group:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+            raise exception
+
         return group
 
     def get_list(self) -> List[tables.Group]:
