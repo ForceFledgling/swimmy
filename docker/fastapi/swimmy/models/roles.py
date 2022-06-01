@@ -1,16 +1,16 @@
-from typing import Optional
+from enum import Enum
 
 from pydantic import BaseModel
 
 
-class RoleName(BaseModel):
+class RoleName(str, Enum):
     administrator = 'administrator'
     instructor = 'instructor'
     client = 'client'
 
 
 class RoleBase(BaseModel):
-    name: Optional[str]
+    name: RoleName
 
 
 class Role(RoleBase):

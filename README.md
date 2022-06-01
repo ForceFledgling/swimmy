@@ -64,7 +64,7 @@ POSTGRES_PASSWORD='toor'
 
 ### 🎉 Additionally:
 
-* You can populate the example in the database with the script when starting the project.
+* You can populate the example in the database with the script when starting this project.
 
 ```bash
     cd swimmy  # root project dir

@@ -11,14 +11,35 @@ from passlib.hash import bcrypt
 from .. import tables
 from ..database import Session, get_session
 from ..models.auth import Token, User, UserCreate
+from ..models.roles import RoleName
 from ..settings import settings
 
 
 oath2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/sign-in')  # обявляем схему с формой авторизации
 
 
-def get_current_user(token: str = Depends(oath2_scheme)) -> User:  # логика как с этой схемой работать
+def get_current_user(token: str = Depends(oath2_scheme)) -> User:
+    '''Получаем текущего пользователя'''
     return AuthService.validate_token(token)
+
+
+def is_administrator(current_user: User = Depends(get_current_user)):
+    '''Проверка, что пользователь является администратором'''
+    if current_user.role_name != RoleName.administrator.name:
+        raise HTTPException(status_code=400, detail="User is not administrator")
+    return current_user
+
+
+def is_instructor_or_higher(current_user: User = Depends(get_current_user)):
+    if current_user.role_name not in [RoleName.instructor.name, RoleName.administrator.name]:
+        raise HTTPException(status_code=400, detail="User is not instructor or high")
+    return current_user
+
+
+def is_instructor(current_user: User = Depends(get_current_user)):
+    if current_user.role_name != RoleName.instructor.name:
+        raise HTTPException(status_code=400, detail="User is not instructor")
+    return current_user
 
 
 class AuthService:
@@ -88,6 +109,7 @@ class AuthService:
             email=user_data.email,
             username=user_data.username,
             password_hash=self.hash_password(user_data.password),
+            role_name=RoleName.client.name,
         )
 
         self.session.add(user)
@@ -118,3 +140,26 @@ class AuthService:
             raise exception
 
         return self.create_token(user)
+
+    def _get(self, user_id: int) -> tables.User:
+        exception = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User with this id does not exist',
+            headers={
+                'WWW-Authenticate': 'Bearer',
+            },
+        )
+
+        user = (
+            self.session
+            .query(tables.User)
+            .filter_by(id=user_id)
+            .first()
+        )
+        if not user:
+            raise exception
+
+        return user
+
+    def get(self, user_id: int) -> tables.User:
+        return self._get(user_id)

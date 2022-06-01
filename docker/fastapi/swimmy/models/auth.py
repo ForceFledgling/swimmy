@@ -1,8 +1,9 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class BaseUser(BaseModel):
-    # role_id: int
     email: str
     username: str
 
@@ -13,6 +14,7 @@ class UserCreate(BaseUser):
 
 class User(BaseUser):
     id: int
+    role_name: Optional[str]
 
     class Config:
         orm_mode = True
