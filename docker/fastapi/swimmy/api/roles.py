@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get('/get', response_model=str)
+@router.get('/{user_id}', response_model=str)
 def get_role(
     user_id: int,
     service: RoleService = Depends(),
@@ -22,7 +22,7 @@ def get_role(
     return service.get_role(user_id, user_data)
 
 
-@router.put('/set', response_model=User)
+@router.put('/{user_id}', response_model=User)
 def set_role(
     user_id: int,
     role_name: RoleName,
@@ -30,5 +30,5 @@ def set_role(
     user_data: AuthService = Depends(),
     service: RoleService = Depends(),
 ):
-    '''Required role to use: administrator'''
+    '''**Required role to use: administrator**'''
     return service.set_role(user_id, user_data, role_name)

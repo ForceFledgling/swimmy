@@ -4,10 +4,10 @@ from pydantic import BaseSettings
 
 
 DB = {
-    'POSTGRES_HOST': os.environ.get("POSTGRES_HOST"),
-    'POSTGRES_DB': os.environ.get("POSTGRES_DB"),
-    'POSTGRES_USER': os.environ.get("POSTGRES_USER"),
-    'POSTGRES_PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+    'HOST': os.environ.get("POSTGRES_HOST"),
+    'DB': os.environ.get("POSTGRES_DB"),
+    'USER': os.environ.get("POSTGRES_USER"),
+    'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
 }
 
 
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     server_host: str = '0.0.0.0'
     server_port: int = 8000
-    database_url: str = f'postgresql://{DB["POSTGRES_USER"]}:{DB["POSTGRES_PASSWORD"]}@{DB["POSTGRES_HOST"]}/{DB["POSTGRES_DB"]}'
+    database_url: str = f'postgresql://{DB["USER"]}:{DB["PASSWORD"]}@{DB["HOST"]}/{DB["DB"]}'
 
     jwt_secret: str
     jwt_algorithm: str = 'HS256'

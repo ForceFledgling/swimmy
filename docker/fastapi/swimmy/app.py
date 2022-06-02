@@ -13,6 +13,10 @@ tags_metadata = [
         'description': 'User role management',
     },
     {
+        'name': 'rooms',
+        'description': 'Working with dressing rooms',
+    },
+    {
         'name': 'groups',
         'description': 'Working with swimming groups',
     },
@@ -22,7 +26,7 @@ tags_metadata = [
 app = FastAPI(
     title='Swimmy',
     description='Web ARM for swimming pool',
-    version='0.1.2',
+    version='0.1.4',
     openapi_tags=tags_metadata,
 )
 app.include_router(router)
