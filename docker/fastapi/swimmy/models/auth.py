@@ -22,4 +22,4 @@ class User(BaseUser):
 
 class Token(BaseModel):
     access_token: str
-    token_type: str = 'bearer'  # bearer - так называют авторизацию на основе access_token
+    token_type: str = 'bearer'

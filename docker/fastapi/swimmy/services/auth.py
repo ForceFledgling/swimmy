@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import List, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.exceptions import ValidationError
@@ -163,3 +164,10 @@ class AuthService:
 
     def get(self, user_id: int) -> tables.User:
         return self._get(user_id)
+
+    def get_list(self, role_name: Optional[RoleName] = None) -> List[tables.User]:
+        query = self.session.query(tables.User)
+        if role_name:
+            query = query.filter_by(role_name=role_name)
+        users = query.all()
+        return users

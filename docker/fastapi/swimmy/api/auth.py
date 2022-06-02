@@ -1,8 +1,11 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from ..models.auth import Token, User, UserCreate
-from ..services.auth import AuthService, get_current_user
+from ..models.roles import RoleName
+from ..services.auth import AuthService, get_current_user, is_instructor_or_higher
 
 
 router = APIRouter(
@@ -30,6 +33,16 @@ def sign_in(
     )
 
 
-@router.get("/me")
-async def get_current_user(current_user: User = Depends(get_current_user)):
+@router.get('/', response_model=List[User])
+def get_users(
+    role_name: Optional[RoleName],
+    service: AuthService = Depends(),
+    user: User = Depends(is_instructor_or_higher),
+):
+    '''Required role to use: instructor or higher'''
+    return service.get_list(role_name)
+
+
+@router.get("/me", response_model=User)
+def get_current_user(current_user: User = Depends(get_current_user)):
     return current_user

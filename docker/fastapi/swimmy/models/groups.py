@@ -10,9 +10,13 @@ class GroupBase(BaseModel):
 
 class Group(GroupBase):
     id: int
+    places: int
+    free_places: int
+    max_mans: int
+    max_womans: int
 
     class Config:
-        orm_mode = True  # указываем что загружаем результат не из питоновских словарей а из моделей ормки
+        orm_mode = True
 
 
 class GroupCreate(GroupBase):
@@ -23,3 +27,15 @@ class GroupCreate(GroupBase):
 class GroupUpdate(GroupBase):
     '''Создал в целях документации и дальнейшего расширения'''
     pass
+
+
+class GroupMemberBase(BaseModel):
+    group_id: int
+    member_id: int
+
+
+class GroupMember(GroupMemberBase):
+    id: int
+
+    class Config:
+        orm_mode = True
