@@ -83,3 +83,25 @@ def leave_the_group(
 ):
     '''The client can leave the group'''
     return service.leave(group_id, user)
+
+
+@router.get('/member/', response_model=GroupMember)
+def add_member_to_group(
+    group_id: int,
+    user_id: int,
+    user: User = Depends(is_instructor_or_higher),
+    service: GroupService = Depends(),
+):
+    '''**Required role to use: instructor or high**'''
+    return service.add_member(group_id, user_id)
+
+
+@router.delete('/member/', response_model=str)
+def delete_member_from_group(
+    group_id: int,
+    user_id: int,
+    user: User = Depends(is_instructor_or_higher),
+    service: GroupService = Depends(),
+):
+    '''**Required role to use: instructor or high**'''
+    return service.delete_member(group_id, user_id)

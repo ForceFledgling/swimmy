@@ -76,13 +76,12 @@ class GroupService:
             .query(tables.GroupMember)
             .filter_by(
                 group_id=group_id,
-                member_id=member_id
+                member_id=member_id,
             )
             .first()
         )
-        if not entry:
-            return False
-        return True
+        if entry:
+            return entry
 
     def join(self, group_id: int, user: User) -> tables.GroupMember:
         exception = HTTPException(
@@ -93,8 +92,8 @@ class GroupService:
             },
         )
 
-        check_user = self._check_group_member(group_id, user.id)
-        if check_user is True:
+        group_member = self._check_group_member(group_id, user.id)
+        if group_member:
             raise exception
 
         group_member = tables.GroupMember(
@@ -114,18 +113,49 @@ class GroupService:
             },
         )
 
-        group_member = (
-            self.session
-            .query(tables.GroupMember)
-            .filter_by(
-                group_id=group_id,
-                member_id=user.id,
-            )
-            .first()
-        )
-        if not group_member:
+        group_member = self._check_group_member(group_id, user.id)
+        if group_member is None:
             raise exception
-        
+
+        self.session.delete(group_member)
+        self.session.commit()
+        return 'OK'
+
+    def add_member(self, group_id: int, user_id: int) -> tables.GroupMember:
+        exception = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='The user is already a member of this group',
+            headers={
+                'WWW-Authenticate': 'Bearer',
+            },
+        )
+
+        group_member = self._check_group_member(group_id, user_id)
+        if group_member:
+            raise exception
+        else:
+            group_member = tables.GroupMember(
+                group_id=group_id,
+                member_id=user_id,
+            )
+
+        self.session.add(group_member)
+        self.session.commit()
+        return group_member
+
+    def delete_member(self, group_id: int, user_id: int) -> tables.GroupMember:
+        exception = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='The user is not a member of a group',
+            headers={
+                'WWW-Authenticate': 'Bearer',
+            },
+        )
+
+        group_member = self._check_group_member(group_id, user_id)
+        if group_member is None:
+            raise exception
+
         self.session.delete(group_member)
         self.session.commit()
         return 'OK'
