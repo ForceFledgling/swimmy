@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 
-from ..models.groups import Group, GroupCreate, GroupUpdate, GroupMember
+from ..models.groups import Group, GroupCreate, GroupMember, GroupUpdate
 from ..services.auth import User, get_current_user, is_administrator, is_instructor_or_higher
 from ..services.groups import GroupService
 
@@ -17,9 +17,7 @@ def get_groups(
     service: GroupService = Depends(),
     user: User = Depends(get_current_user),
 ):
-    '''Required role to use: instructor or higher
-    ПОКАЗЫВАТЬ КОЛ-ВО ЗАНЯТЫХ и СВОБОДНЫХ МЕСТ
-    '''
+    '''ПОКАЗЫВАТЬ КОЛ-ВО ЗАНЯТЫХ и СВОБОДНЫХ МЕСТ'''  # FIXME
     return service.get_list()
 
 
@@ -84,4 +82,4 @@ def leave_the_group(
     service: GroupService = Depends(),
 ):
     '''The client can leave the group'''
-    return service.leave(group_id)
+    return service.leave(group_id, user)

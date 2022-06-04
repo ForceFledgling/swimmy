@@ -105,9 +105,27 @@ class GroupService:
         self.session.commit()
         return group_member
 
-    def leave(self, group_id: int) -> tables.Group:
-        group = self._get(group_id)
-        # setattr(group, field, value)
-        # self.session.commit()
-        # print('1111111111group.members_id', type(set(group.members_id)), set(group.members_id))
-        return group
+    def leave(self, group_id: int, user: User) -> str:
+        exception = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='The user is not a member of a group',
+            headers={
+                'WWW-Authenticate': 'Bearer',
+            },
+        )
+
+        group_member = (
+            self.session
+            .query(tables.GroupMember)
+            .filter_by(
+                group_id=group_id,
+                member_id=user.id,
+            )
+            .first()
+        )
+        if not group_member:
+            raise exception
+        
+        self.session.delete(group_member)
+        self.session.commit()
+        return 'OK'
