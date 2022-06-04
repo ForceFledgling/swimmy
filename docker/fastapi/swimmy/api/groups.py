@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Response, status
 from ..models.groups import Group, GroupCreate, GroupMember, GroupUpdate
 from ..services.auth import User, get_current_user, is_administrator, is_instructor_or_higher
 from ..services.groups import GroupService
+from ..services.rooms import RoomService
 
 router = APIRouter(
     prefix='/groups',
@@ -36,11 +37,12 @@ def get_group(
 @router.post('/', response_model=Group)
 def create_group(
     group_data: GroupCreate = Depends(),
+    room_data: RoomService = Depends(),
     user: User = Depends(is_administrator),
     service: GroupService = Depends(),
 ):
     '''**Required role to use: administrator**'''
-    return service.create(group_data)
+    return service.create(group_data, room_data)
 
 
 @router.put('/{group_id}', response_model=Group)
@@ -65,7 +67,7 @@ def delete_group(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.put('/join/{group_id}', response_model=GroupMember)
+@router.post('/join/{group_id}', response_model=GroupMember)
 def join_the_group(
     group_id: int,
     user: User = Depends(get_current_user),
@@ -75,7 +77,7 @@ def join_the_group(
     return service.join(group_id, user)
 
 
-@router.put('/leave/{group_id}', response_model=str)
+@router.delete('/leave/{group_id}', response_model=str)
 def leave_the_group(
     group_id: int,
     user: User = Depends(get_current_user),
@@ -85,7 +87,7 @@ def leave_the_group(
     return service.leave(group_id, user)
 
 
-@router.get('/member/', response_model=GroupMember)
+@router.post('/member/', response_model=GroupMember)
 def add_member_to_group(
     group_id: int,
     user_id: int,

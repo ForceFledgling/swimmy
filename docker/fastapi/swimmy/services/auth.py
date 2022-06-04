@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.exceptions import ValidationError
 from fastapi.security import OAuth2PasswordBearer
 
@@ -27,13 +27,13 @@ def get_current_user(token: str = Depends(oath2_scheme)) -> User:
 def is_administrator(current_user: User = Depends(get_current_user)):
     '''Проверка, что пользователь является администратором'''
     if current_user.role_name != RoleName.administrator.name:
-        raise HTTPException(status_code=400, detail="User is not administrator")
+        raise HTTPException(status_code=400, detail="User is not administrator") from None
     return current_user
 
 
 def is_instructor_or_higher(current_user: User = Depends(get_current_user)):
     if current_user.role_name not in [RoleName.instructor.name, RoleName.administrator.name]:
-        raise HTTPException(status_code=400, detail="User is not instructor or high")
+        raise HTTPException(status_code=400, detail="User is not instructor or high") from None
     return current_user
 
 
@@ -54,13 +54,6 @@ class AuthService:
 
     @classmethod
     def validate_token(cls, token: str) -> User:
-        exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Could not validate credentials',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
-        )
 
         try:
             payload = jwt.decode(
@@ -69,14 +62,14 @@ class AuthService:
                 algorithms=[settings.jwt_algorithm],
             )
         except JWTError:
-            raise exception from None
+            raise HTTPException(status_code=406, detail='Could not validate credentials') from None
 
         user_data = payload.get('user')
 
         try:
             user = User.parse_obj(user_data)
         except ValidationError:
-            raise exception from None
+            raise HTTPException(status_code=406, detail='Could not validate credentials') from None
 
         return user
 
@@ -119,13 +112,6 @@ class AuthService:
         return self.create_token(user)
 
     def authenticate_user(self, username: str, password: str) -> Token:
-        exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Incorrect username or password',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
-        )
 
         user = (
             self.session
@@ -135,21 +121,14 @@ class AuthService:
         )
 
         if not User:
-            raise exception
+            raise HTTPException(status_code=406, detail='Incorrect username or password') from None
 
         if not self.verify_password(password, user.password_hash):
-            raise exception
+            raise HTTPException(status_code=406, detail='Incorrect username or password') from None
 
         return self.create_token(user)
 
     def _get(self, user_id: int) -> tables.User:
-        exception = HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='User with this id does not exist',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
-        )
 
         user = (
             self.session
@@ -158,7 +137,7 @@ class AuthService:
             .first()
         )
         if not user:
-            raise exception
+            raise HTTPException(status_code=406, detail='User with this id does not exist') from None
 
         return user
 
