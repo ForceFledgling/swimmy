@@ -1,7 +1,6 @@
 from typing import List
 
-from fastapi import Depends, status
-from fastapi.exceptions import HTTPException
+from fastapi import Depends, HTTPException
 
 from .. import tables
 from ..database import Session, get_session
@@ -12,15 +11,21 @@ class RoomService:
     def __init__(self, session: Session = Depends(get_session)):
         self.session = session
 
-    def _get(self, room_id: int) -> tables.Room:
-        exception = HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='Room with this id does not exist',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
+    def _get_capacity_rooms(self):
+        rooms = (
+            self.session
+            .query(tables.Room)
+            .all()
         )
+        capacity_male = capacity_female = 0
+        for room in rooms:
+            if room.sex == 'male':
+                capacity_male += room.capacity
+            elif room.sex == 'female':
+                capacity_female += room.capacity
+        return [capacity_male, capacity_female, capacity_male + capacity_female]
 
+    def _get(self, room_id: int) -> tables.Room:
         room = (
             self.session
             .query(tables.Room)
@@ -28,7 +33,7 @@ class RoomService:
             .first()
         )
         if not room:
-            raise exception
+            raise HTTPException(status_code=406, detail='Room with this id does not exist') from None
 
         return room
 
@@ -56,7 +61,8 @@ class RoomService:
         self.session.commit()
         return room
 
-    def delete(self, room_id) -> None:
+    def delete(self, room_id) -> str:
         room = self._get(room_id)
         self.session.delete(room)
         self.session.commit()
+        return 'OK'

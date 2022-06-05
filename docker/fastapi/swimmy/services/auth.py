@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.exceptions import ValidationError
 from fastapi.security import OAuth2PasswordBearer
 
@@ -27,13 +27,13 @@ def get_current_user(token: str = Depends(oath2_scheme)) -> User:
 def is_administrator(current_user: User = Depends(get_current_user)):
     '''Проверка, что пользователь является администратором'''
     if current_user.role_name != RoleName.administrator.name:
-        raise HTTPException(status_code=400, detail="User is not administrator")
+        raise HTTPException(status_code=400, detail="User is not administrator") from None
     return current_user
 
 
 def is_instructor_or_higher(current_user: User = Depends(get_current_user)):
     if current_user.role_name not in [RoleName.instructor.name, RoleName.administrator.name]:
-        raise HTTPException(status_code=400, detail="User is not instructor or high")
+        raise HTTPException(status_code=400, detail="User is not instructor or high") from None
     return current_user
 
 
@@ -54,14 +54,6 @@ class AuthService:
 
     @classmethod
     def validate_token(cls, token: str) -> User:
-        exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Could not validate credentials',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
-        )
-
         try:
             payload = jwt.decode(
                 token,
@@ -69,23 +61,18 @@ class AuthService:
                 algorithms=[settings.jwt_algorithm],
             )
         except JWTError:
-            raise exception from None
-
+            raise HTTPException(status_code=406, detail='Could not validate credentials') from None
         user_data = payload.get('user')
-
         try:
             user = User.parse_obj(user_data)
         except ValidationError:
-            raise exception from None
-
+            raise HTTPException(status_code=406, detail='Could not validate credentials') from None
         return user
 
     @classmethod
     def create_token(cls, user: tables.User) -> Token:
         user_data = User.from_orm(user)  # преобразуем из модели orm в модел pydantic
-
         now = datetime.utcnow()
-
         payload = {
             'iat': now,  # время создания токена
             'nbf': now,  # время до которой токен нельзя использовать (в формате UTC!)
@@ -93,74 +80,59 @@ class AuthService:
             'sub': str(user_data.id),  # обозначает пользователя которому выдан токен
             'user': user_data.dict(),  # модель пользователя в виде словаря
         }
-
         token = jwt.encode(
             payload,
             settings.jwt_secret,
             algorithm=settings.jwt_algorithm,
         )
-
         return Token(access_token=token)
 
     def __init__(self, session: Session = Depends(get_session)):
         self.session = session
 
-    def register_new_user(self, user_data: UserCreate) -> Token:  # при регистрации так же выполняется и авторизация
-        user = tables.User(
-            email=user_data.email,
-            username=user_data.username,
-            password_hash=self.hash_password(user_data.password),
-            role_name=RoleName.client.name,
-        )
-
-        self.session.add(user)
-        self.session.commit()
-
-        return self.create_token(user)
-
-    def authenticate_user(self, username: str, password: str) -> Token:
-        exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Incorrect username or password',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
-        )
-
-        user = (
-            self.session
-            .query(tables.User)
-            .filter(tables.User.username == username)
-            .first()
-        )
-
-        if not User:
-            raise exception
-
-        if not self.verify_password(password, user.password_hash):
-            raise exception
-
-        return self.create_token(user)
-
     def _get(self, user_id: int) -> tables.User:
-        exception = HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail='User with this id does not exist',
-            headers={
-                'WWW-Authenticate': 'Bearer',
-            },
-        )
-
+        '''Получаем пользователя если он существует'''
         user = (
             self.session
             .query(tables.User)
             .filter_by(id=user_id)
             .first()
         )
+        print('22222222222222', user_id, user)
         if not user:
-            raise exception
-
+            raise HTTPException(status_code=406, detail='User with this id does not exist') from None
         return user
+
+    def _check_role_by_user_id(self, user_id: int, role_name: str) -> tables.User:
+        '''Проверяем пользователя, на вхождение в роль'''
+        user = AuthService._get(self, user_id)
+        if user.role_name == role_name:
+            return user
+
+    def register_new_user(self, user_data: UserCreate) -> Token:
+        '''Регистрация нового пользовтеля. При регистрации так же выполняется и авторизация.'''
+        user = tables.User(
+            email=user_data.email,
+            username=user_data.username,
+            password_hash=self.hash_password(user_data.password),
+            role_name=RoleName.client.name,
+        )
+        self.session.add(user)
+        self.session.commit()
+        return self.create_token(user)
+
+    def authenticate_user(self, username: str, password: str) -> Token:
+        user = (
+            self.session
+            .query(tables.User)
+            .filter(tables.User.username == username)
+            .first()
+        )
+        if not User:
+            raise HTTPException(status_code=406, detail='Incorrect username or password') from None
+        if not self.verify_password(password, user.password_hash):
+            raise HTTPException(status_code=406, detail='Incorrect username or password') from None
+        return self.create_token(user)
 
     def get(self, user_id: int) -> tables.User:
         return self._get(user_id)
