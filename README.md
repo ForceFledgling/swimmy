@@ -1,6 +1,8 @@
-# 🙉 What's all the Swimmy ?
+<p align="center">
+ <img src="https://user-images.githubusercontent.com/92352077/172070427-9e2e2519-e28f-4e81-ae86-5529de256622.png" alt=""/>
+</p>
 
-Software system for organizing the work of sports swimming pools, , assembled on:
+Software system for organizing the work of sports swimming pools, assembled on:
 
 * FastAPI
   * SQLAlchemy
