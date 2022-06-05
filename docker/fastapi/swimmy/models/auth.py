@@ -1,11 +1,18 @@
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
 
 
+class UserSex(str, Enum):
+    male = 'male'
+    female = 'female'
+
+
 class BaseUser(BaseModel):
     email: str
     username: str
+    sex: UserSex
 
 
 class UserCreate(BaseUser):

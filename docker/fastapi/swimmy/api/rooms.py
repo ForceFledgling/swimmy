@@ -54,12 +54,11 @@ def update_room(
     return service.update(room_id, room_data)
 
 
-@router.delete('/{room_id}')
+@router.delete('/{room_id}', response_model=str)
 def delete_room(
     room_id: int,
     user: User = Depends(is_administrator),
     service: RoomService = Depends(),
 ):
     '''**Required role to use: administrator**'''
-    service.delete(room_id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return service.delete(room_id)

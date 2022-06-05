@@ -13,6 +13,10 @@ tags_metadata = [
         'description': 'User role management',
     },
     {
+        'name': 'instructors',
+        'description': 'Instructor working hours',
+    },
+    {
         'name': 'rooms',
         'description': 'Working with dressing rooms',
     },

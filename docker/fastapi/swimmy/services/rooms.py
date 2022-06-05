@@ -61,7 +61,8 @@ class RoomService:
         self.session.commit()
         return room
 
-    def delete(self, room_id) -> None:
+    def delete(self, room_id) -> str:
         room = self._get(room_id)
         self.session.delete(room)
         self.session.commit()
+        return 'OK'

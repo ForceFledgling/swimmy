@@ -11,7 +11,6 @@ class GroupBase(BaseModel):
 class Group(GroupBase):
     id: int
     places: int
-    free_places: int
     max_mans: int
     max_womans: int
 
@@ -35,6 +34,18 @@ class GroupMemberBase(BaseModel):
 
 
 class GroupMember(GroupMemberBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class GroupInstructorBase(BaseModel):
+    group_id: int
+    instructor_id: int
+
+
+class GroupInstructor(GroupInstructorBase):
     id: int
 
     class Config:
