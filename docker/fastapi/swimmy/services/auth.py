@@ -31,6 +31,13 @@ def is_administrator(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+def is_not_administrator(current_user: User = Depends(get_current_user)):
+    '''Проверка, что пользователь не является администратором'''
+    if current_user.role_name == RoleName.administrator.name:
+        raise HTTPException(status_code=400, detail="User is administrator") from None
+    return current_user
+
+
 def is_instructor_or_higher(current_user: User = Depends(get_current_user)):
     if current_user.role_name not in [RoleName.instructor.name, RoleName.administrator.name]:
         raise HTTPException(status_code=400, detail="User is not instructor or high") from None
@@ -98,7 +105,6 @@ class AuthService:
             .filter_by(id=user_id)
             .first()
         )
-        print('22222222222222', user_id, user)
         if not user:
             raise HTTPException(status_code=406, detail='User with this id does not exist') from None
         return user
@@ -116,6 +122,7 @@ class AuthService:
             username=user_data.username,
             password_hash=self.hash_password(user_data.password),
             role_name=RoleName.client.name,
+            sex=user_data.sex,
         )
         self.session.add(user)
         self.session.commit()

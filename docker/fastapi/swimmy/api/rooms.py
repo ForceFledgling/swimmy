@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends
 
 from ..models.auth import User
 from ..models.rooms import Room, RoomCreate, RoomUpdate

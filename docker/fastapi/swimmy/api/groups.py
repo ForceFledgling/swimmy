@@ -2,8 +2,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 
-from ..models.groups import Group, GroupCreate, GroupInstructor, GroupMember, GroupUpdate
-from ..services.auth import User, get_current_user, is_administrator, is_instructor_or_higher
+from ..models.groups import Group, GroupCreate, GroupDetailed, GroupInstructor, GroupMember, GroupUpdate
+from ..services.auth import User, get_current_user, is_administrator, is_instructor_or_higher, is_not_administrator
 from ..services.groups import GroupService
 from ..services.rooms import RoomService
 
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[Group])
+@router.get('/', response_model=List[GroupDetailed])
 def get_groups(
     service: GroupService = Depends(),
     user: User = Depends(get_current_user),
@@ -94,6 +94,15 @@ def get_group_members(
 ):
     '''**Required role to use: instructor or high**'''
     return service.get_list_members()
+
+
+@router.get('/members/me', response_model=List[GroupMember])
+def get_my_groups(
+    service: GroupService = Depends(),
+    user: User = Depends(is_not_administrator),
+):
+    '''Required role to use: instructor or client'''
+    return service.get_my_groups(user)
 
 
 @router.post('/members/', response_model=GroupMember)
