@@ -17,4 +17,4 @@ class Role(RoleBase):
     id: int
 
     class Config:
-        orm_mode = True  # указываем что загружаем результат не из питоновских словарей а из моделей ормки
+        orm_mode = True

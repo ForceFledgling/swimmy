@@ -15,8 +15,8 @@ Software system for organizing the work of sports swimming pools, assembled on:
 # Features
 
 Instructor:
-* can work no more and no less than a certain number of hours per week;
-* has preferred opening hours;
+* can work no more and no less than a certain number of hours per week
+* has preferred opening hours
 
 Administrator:
 * can create groups and assign an instructor there, while choosing
@@ -71,5 +71,9 @@ POSTGRES_PASSWORD='toor'
 ```bash
     cd swimmy  # root project dir
     docker-compose down
-    docker-compose -f docker-compose.dev.yml up --build --force-recreate --no-deps -d
+    docker-compose -f docker-compose.data.yml up --build --force-recreate --no-deps -d
+```
+or run the script manually, inside the container
+```bash
+    root@c1788b7d6f1c:/fastapi# python example_data.py
 ```
