@@ -35,7 +35,7 @@ def sign_in(
 
 @router.get('/', response_model=List[User])
 def get_users(
-    role_name: Optional[RoleName],
+    role_name: Optional[RoleName] = None,
     service: AuthService = Depends(),
     user: User = Depends(is_instructor_or_higher),
 ):

@@ -30,7 +30,7 @@ tags_metadata = [
 app = FastAPI(
     title='Swimmy',
     description='Web ARM for swimming pool',
-    version='0.1.5',
+    version='0.1.6',
     openapi_tags=tags_metadata,
 )
 app.include_router(router)

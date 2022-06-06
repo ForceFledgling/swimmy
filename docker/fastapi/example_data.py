@@ -83,14 +83,14 @@ def groups(cur) -> None:
         cur.execute("ALTER SEQUENCE groups_instructors_id_seq RESTART WITH 1")
         cur.execute(
             "INSERT INTO groups_instructors (group_id,instructor_id) VALUES \
-                (1, 1),\
-                (2, 1),\
-                (5, 1),\
-                (6, 1),\
-                (3, 2),\
-                (4, 2),\
-                (7, 2),\
-                (8, 2)\
+                (1, 2),\
+                (2, 2),\
+                (5, 2),\
+                (6, 2),\
+                (3, 3),\
+                (4, 3),\
+                (7, 3),\
+                (8, 3)\
             ",
         )
 
@@ -117,20 +117,20 @@ def groups(cur) -> None:
         for group_id in range(1, 9):
 
             if len(users_male) > 0:
-                for i in range(room_capacity_male):
+                for _ in range(room_capacity_male):
                     for user_id in users_male:
                         cur.execute(
-                            f"INSERT INTO groups_members (group_id,member_id) VALUES \
-                                ('{group_id}', '{user_id}')",
+                            f"INSERT INTO groups_members (group_id,member_id,member_sex) VALUES \
+                                ('{group_id}', '{user_id}', 'male')",
                         )
                         users_male.remove(user_id)
                         break
             if len(users_female) > 0:
-                for i in range(room_capacity_male):
+                for _ in range(room_capacity_male):
                     for user_id in users_female:
                         cur.execute(
-                            f"INSERT INTO groups_members (group_id,member_id) VALUES \
-                                ('{group_id}', '{user_id}')",
+                            f"INSERT INTO groups_members (group_id,member_id,member_sex) VALUES \
+                                ('{group_id}', '{user_id}', 'female')",
                         )
                         users_female.remove(user_id)
                         break

@@ -18,6 +18,15 @@ class Group(GroupBase):
         orm_mode = True
 
 
+class GroupDetailed(Group):
+    instructor: str
+    # busy_male: int
+    # busy_female: int
+
+    class Config:
+        orm_mode = True
+
+
 class GroupCreate(GroupBase):
     '''Создал в целях документации и дальнейшего расширения'''
     pass
@@ -35,6 +44,7 @@ class GroupMemberBase(BaseModel):
 
 class GroupMember(GroupMemberBase):
     id: int
+    member_sex: str
 
     class Config:
         orm_mode = True

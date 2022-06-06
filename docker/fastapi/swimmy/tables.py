@@ -12,7 +12,7 @@ class User(Base):
     role_name = sa.Column(sa.String)
     email = sa.Column(sa.Text, unique=True)
     username = sa.Column(sa.Text, unique=True)
-    sex = sa.Column(sa.String)
+    sex = sa.Column(sa.String, nullable=False)
     password_hash = sa.Column(sa.Text)
 
 
@@ -42,6 +42,7 @@ class GroupMember(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     group_id = sa.Column(sa.Integer, sa.ForeignKey('groups.id'), nullable=False)
     member_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'), nullable=False)
+    member_sex = sa.Column(sa.String, nullable=False)
 
 
 class GroupInstructor(Base):
