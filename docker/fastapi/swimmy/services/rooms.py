@@ -12,6 +12,7 @@ class RoomService:
         self.session = session
 
     def _get_capacity_rooms(self):
+        '''Get room capacity'''
         rooms = (
             self.session
             .query(tables.Room)
@@ -26,6 +27,7 @@ class RoomService:
         return [capacity_male, capacity_female, capacity_male + capacity_female]
 
     def _get(self, room_id: int) -> tables.Room:
+        '''Get room'''
         room = (
             self.session
             .query(tables.Room)
@@ -38,9 +40,11 @@ class RoomService:
         return room
 
     def get(self, room_id: int) -> tables.Room:
+        '''Get room'''
         return self._get(room_id)
 
     def get_list(self) -> List[tables.Room]:
+        '''Get rooms list'''
         rooms = (
             self.session
             .query(tables.Room)
@@ -49,12 +53,14 @@ class RoomService:
         return rooms
 
     def create(self, room_data: RoomCreate) -> tables.Room:
+        '''Create room'''
         room = tables.Room(**room_data.dict())
         self.session.add(room)
         self.session.commit()
         return room
 
     def update(self, room_id: int, room_data: RoomUpdate) -> tables.Room:
+        '''Update room information'''
         room = self._get(room_id)
         for field, value in room_data:
             setattr(room, field, value)
@@ -62,6 +68,7 @@ class RoomService:
         return room
 
     def delete(self, room_id) -> str:
+        '''Delete room'''
         room = self._get(room_id)
         self.session.delete(room)
         self.session.commit()

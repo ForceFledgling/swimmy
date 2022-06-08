@@ -15,6 +15,7 @@ class InstructorService:
         self.session = session
 
     def _get(self, user_id):
+        '''Get specified instructur'''
         hours = (
             self.session
             .query(tables.InstructorWorkingHours)
@@ -24,6 +25,7 @@ class InstructorService:
         return hours
 
     def get_list(self) -> List[tables.InstructorWorkingHours]:
+        '''Get instructurs list'''
         groups = (
             self.session
             .query(tables.InstructorWorkingHours)
@@ -32,7 +34,7 @@ class InstructorService:
         return groups
 
     def create(self, user_id, hours_data: Depends(BaseInstructorWorkingHours)) -> tables.InstructorWorkingHours:
-
+        '''Create specify the hours for the instructor'''
         if AuthService._check_role_by_user_id(self, user_id=user_id, role_name='instructor') is None:
             raise HTTPException(status_code=406, detail='User with this id is not instructor') from None
 
@@ -49,9 +51,10 @@ class InstructorService:
         return working_hours
 
     def delete(self, user_id):
+        '''Delete specify the hours for the instructor'''
         hours = self._get(user_id)
         if hours is None:
-            raise HTTPException(status_code=406, detail='Hours for this instructor not exist') from None
+            raise HTTPException(status_code=406, detail='Hours for this instructor not exist.') from None
         self.session.delete(hours)
         self.session.commit()
         return 'OK'

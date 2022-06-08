@@ -2,9 +2,9 @@ from fastapi import APIRouter
 
 from .auth import router as auth_router
 from .groups import router as groups_router
+from .instuctots import router as instructors_router
 from .roles import router as roles_router
 from .rooms import router as rooms_router
-from .instuctots import router as instructors_router
 
 
 router = APIRouter()

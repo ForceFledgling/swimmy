@@ -12,10 +12,12 @@ class RoleService:
         self.session = session
 
     def get_role(self, user_id: int, user_data: AuthService) -> RoleBase:
+        '''Get specified role'''
         user = user_data.get(user_id)
         return user.role_name
 
     def set_role(self, user_id: int, user_data: User, role_name: RoleName) -> tables.User:
+        '''Set specified role for user'''
         user = user_data.get(user_id)
         role_feild = 'role_name'
         setattr(user, role_feild, role_name)

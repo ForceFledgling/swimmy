@@ -66,14 +66,7 @@ POSTGRES_PASSWORD='toor'
 
 ### 🎉 Additionally:
 
-* You can populate the example in the database with the script when starting this project.
-
-```bash
-    cd swimmy  # root project dir
-    docker-compose down
-    docker-compose -f docker-compose.data.yml up --build --force-recreate --no-deps -d
-```
-or run the script manually, inside the container
+* You can populate the example in the database with a script when building this project.
 ```bash
     root@c1788b7d6f1c:/fastapi# python example_data.py
 ```
