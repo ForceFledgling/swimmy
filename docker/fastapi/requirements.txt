@@ -8,3 +8,4 @@ psycopg2 # адаптер для работы с PostgreSQL
 python-jose # для работы с JWT
 passlib[bcrypt] # для хешировани и валидации паролей
 python-multipart # парсер, используется для форм
+requests # for fastapi pytest
