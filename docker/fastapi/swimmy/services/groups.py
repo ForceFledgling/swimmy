@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .. import tables
 from ..database import get_session
 from ..models.auth import User
-from ..models.groups import Group, GroupBase, GroupCreate, GroupDetailed, GroupUpdate
+from ..models.groups import Group, GroupCreate, GroupDetailed, GroupUpdate
 from .. services.auth import AuthService
 from ..services.rooms import RoomService
 
@@ -67,29 +67,27 @@ class GroupService:
         return groups
 
     def get_list(self) -> List[tables.Group]:
-        '''Получаем все записи из таблицы с группами'''
+        '''Getting detailed records from a table with groups'''
         groups = (
             self.session
             .query(tables.Group)
             .all()
         )
-
         groups_detailed = []
         for group in groups:
             group = Group.from_orm(group)
             instructor_name = self._get_group_instructor(group.id)
-            group = GroupDetailed(**group.dict(), instructor=instructor_name)
+            busy_places_count = self.get_busy_places_count(group.id)
+            busy_places_male = busy_places_count[0]
+            busy_places_female = busy_places_count[1]
+            group = GroupDetailed(
+                **group.dict(),
+                instructor=instructor_name,
+                busy_male=busy_places_male,
+                busy_female=busy_places_female,
+            )
             groups_detailed.append(group)
         return groups_detailed
-
-    # def get_list(self) -> List[tables.Group]:
-    #     '''Получаем все записи из таблицы с группами'''
-    #     groups = (
-    #         self.session
-    #         .query(tables.Group)
-    #         .all()
-    #     )
-    #     return groups
 
     def get_list_instructors(self) -> List[tables.GroupInstructor]:
         '''Получаем все записи из таблицы с инструкторами всех групп'''

@@ -13,12 +13,11 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[GroupDetailed])
+@router.get('/', response_model=List[GroupDetailed], name='get groups')
 def get_groups(
     service: GroupService = Depends(),
-    user: User = Depends(get_current_user),
+    # user: User = Depends(get_current_user),
 ):
-    '''ПОКАЗЫВАТЬ КОЛ-ВО ЗАНЯТЫХ и СВОБОДНЫХ МЕСТ'''  # FIXME
     return service.get_list()
 
 
@@ -28,9 +27,7 @@ def get_group(
     user: User = Depends(is_instructor_or_higher),
     service: GroupService = Depends(),
 ):
-    '''**Required role to use: administrator**
-    ДОБАВИТЬ СЮДА ОТОБРАЖЕНИЕ МЕМБЕРОВ ИЛИ КУДА
-    '''
+    '''**Required role to use: administrator**'''
     return service.get(group_id)
 
 
@@ -98,8 +95,8 @@ def get_group_members(
 
 @router.get('/members/me', response_model=List[GroupMember])
 def get_my_groups(
-    service: GroupService = Depends(),
     user: User = Depends(is_not_administrator),
+    service: GroupService = Depends(),
 ):
     '''Required role to use: instructor or client'''
     return service.get_my_groups(user)

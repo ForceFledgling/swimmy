@@ -20,8 +20,8 @@ class Group(GroupBase):
 
 class GroupDetailed(Group):
     instructor: str
-    # busy_male: int
-    # busy_female: int
+    busy_male: int
+    busy_female: int
 
     class Config:
         orm_mode = True
