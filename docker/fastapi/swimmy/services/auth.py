@@ -20,47 +20,52 @@ oath2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/sign-in')  # обявляе�
 
 
 def get_current_user(token: str = Depends(oath2_scheme)) -> User:
-    '''Получаем текущего пользователя'''
+    '''Get the current user.'''
     return AuthService.validate_token(token)
 
 
 def is_administrator(current_user: User = Depends(get_current_user)):
-    '''Проверка, что пользователь является администратором'''
+    '''Checking if the user is an administrator.'''
     if current_user.role_name != RoleName.administrator.name:
-        raise HTTPException(status_code=400, detail="User is not administrator") from None
+        raise HTTPException(status_code=400, detail="User is not administrator.") from None
     return current_user
 
 
 def is_not_administrator(current_user: User = Depends(get_current_user)):
-    '''Проверка, что пользователь не является администратором'''
+    '''Checking if the user is not an administrator.'''
     if current_user.role_name == RoleName.administrator.name:
-        raise HTTPException(status_code=400, detail="User is administrator") from None
+        raise HTTPException(status_code=400, detail="User is administrator.") from None
     return current_user
 
 
 def is_instructor_or_higher(current_user: User = Depends(get_current_user)):
+    '''Checking if the user is an instructor or high.'''
     if current_user.role_name not in [RoleName.instructor.name, RoleName.administrator.name]:
-        raise HTTPException(status_code=400, detail="User is not instructor or high") from None
+        raise HTTPException(status_code=400, detail="User is not instructor or high.") from None
     return current_user
 
 
 def is_instructor(current_user: User = Depends(get_current_user)):
+    '''Checking if the user is an instructor.'''
     if current_user.role_name != RoleName.instructor.name:
-        raise HTTPException(status_code=400, detail="User is not instructor")
+        raise HTTPException(status_code=400, detail="User is not instructor.")
     return current_user
 
 
 class AuthService:
     @classmethod
     def verify_password(cls, plain_password: str, hashed_password: str) -> bool:
+        '''Checking the hash of the original string and the encrypted password.'''
         return bcrypt.verify(plain_password, hashed_password)
 
     @classmethod
     def hash_password(cls, password: str) -> str:
+        '''Password hashing.'''
         return bcrypt.hash(password)
 
     @classmethod
     def validate_token(cls, token: str) -> User:
+        '''Token validation.'''
         try:
             payload = jwt.decode(
                 token,
@@ -68,16 +73,17 @@ class AuthService:
                 algorithms=[settings.jwt_algorithm],
             )
         except JWTError:
-            raise HTTPException(status_code=406, detail='Could not validate credentials') from None
+            raise HTTPException(status_code=406, detail='Could not validate credentials.') from None
         user_data = payload.get('user')
         try:
             user = User.parse_obj(user_data)
         except ValidationError:
-            raise HTTPException(status_code=406, detail='Could not validate credentials') from None
+            raise HTTPException(status_code=406, detail='Could not validate credentials.') from None
         return user
 
     @classmethod
     def create_token(cls, user: tables.User) -> Token:
+        '''Creation of a token.'''
         user_data = User.from_orm(user)  # преобразуем из модели orm в модел pydantic
         now = datetime.utcnow()
         payload = {
@@ -98,7 +104,7 @@ class AuthService:
         self.session = session
 
     def _get(self, user_id: int) -> tables.User:
-        '''Получаем пользователя если он существует'''
+        '''Protected feature. Get the user if it exists.'''
         user = (
             self.session
             .query(tables.User)
@@ -106,17 +112,17 @@ class AuthService:
             .first()
         )
         if not user:
-            raise HTTPException(status_code=406, detail='User with this id does not exist') from None
+            raise HTTPException(status_code=406, detail='User with this id does not exist.') from None
         return user
 
     def _check_role_by_user_id(self, user_id: int, role_name: str) -> tables.User:
-        '''Проверяем пользователя, на вхождение в роль'''
+        '''Checking if a user is in a role.'''
         user = AuthService._get(self, user_id)
         if user.role_name == role_name:
             return user
 
     def register_new_user(self, user_data: UserCreate) -> Token:
-        '''Регистрация нового пользовтеля. При регистрации так же выполняется и авторизация.'''
+        '''New User Registration. Registration also requires authorization.'''
         user = tables.User(
             email=user_data.email,
             username=user_data.username,
@@ -129,6 +135,7 @@ class AuthService:
         return self.create_token(user)
 
     def authenticate_user(self, username: str, password: str) -> Token:
+        '''Authentication.'''
         user = (
             self.session
             .query(tables.User)
@@ -136,15 +143,17 @@ class AuthService:
             .first()
         )
         if not User:
-            raise HTTPException(status_code=406, detail='Incorrect username or password') from None
+            raise HTTPException(status_code=406, detail='Incorrect username or password.') from None
         if not self.verify_password(password, user.password_hash):
-            raise HTTPException(status_code=406, detail='Incorrect username or password') from None
+            raise HTTPException(status_code=406, detail='Incorrect username or password.') from None
         return self.create_token(user)
 
     def get(self, user_id: int) -> tables.User:
+        '''Get a specific user.'''
         return self._get(user_id)
 
     def get_list(self, role_name: Optional[RoleName] = None) -> List[tables.User]:
+        '''Get a list of all users.'''
         query = self.session.query(tables.User)
         if role_name:
             query = query.filter_by(role_name=role_name)
