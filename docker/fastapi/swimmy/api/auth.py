@@ -22,7 +22,7 @@ def sign_up(
     return service.register_new_user(user_data)
 
 
-@router.post('/sign-in', response_model=Token)
+@router.post('/sign-in', response_model=Token, name='sign-in')
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
     service: AuthService = Depends(),

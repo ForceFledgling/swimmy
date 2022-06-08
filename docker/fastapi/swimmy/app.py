@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from .api import router
 
@@ -34,3 +35,5 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 app.include_router(router)
+
+client = TestClient(app)

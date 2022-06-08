@@ -18,15 +18,8 @@ Session = sessionmaker(
 
 
 def get_session() -> Session:
-    '''
-    Внедрение зависимостей в обработчик.
-    Любой callable :
-    1. Функции, классы, экземпляры классов
-    2. Генераторы
-    3. Асинхронные функции и генераторы
-    '''
     session = Session()
     try:
-        yield session  # передаем сессию в обработчик
+        yield session
     finally:
         session.close()
